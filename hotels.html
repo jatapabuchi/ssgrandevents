@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotels - SS Grand Events</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body { background: linear-gradient(135deg, #0a0a1e 0%, #0d1b2a 100%); min-height: 100vh; }
+
+        .page-hero {
+            background: linear-gradient(135deg, #0a0a1e, #0d1b2a);
+            padding: 3rem 2rem 2rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(0,212,255,0.15);
+        }
+
+        .breadcrumb {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.4);
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a { color: #00d4ff; text-decoration: none; }
+        .breadcrumb a:hover { text-decoration: underline; }
+
+        .page-hero h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #00d4ff, #0099ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-hero p {
+            color: rgba(255,255,255,0.5);
+            font-size: 1rem;
+        }
+
+        .places-section {
+            padding: 3rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .places-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .place-card {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(0,212,255,0.15);
+            border-radius: 16px;
+            overflow: hidden;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: block;
+            position: relative;
+        }
+
+        .place-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(0,212,255,0.5);
+            box-shadow: 0 20px 50px rgba(0,212,255,0.15);
+        }
+
+        .place-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #00d4ff, #0099ff);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+
+        .place-card:hover::before { transform: scaleX(1); }
+
+        .place-img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            display: block;
+            background: linear-gradient(135deg, #0d1b2a, #1a1a2e);
+        }
+
+        .place-img-placeholder {
+            width: 100%;
+            height: 180px;
+            background: linear-gradient(135deg, #0d1b2a, #1a3a5c);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+        }
+
+        .place-info {
+            padding: 1.2rem 1.5rem;
+        }
+
+        .place-info h3 {
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+
+        .place-info .hotel-count {
+            color: #00d4ff;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .place-info .arrow {
+            float: right;
+            color: rgba(255,255,255,0.3);
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .place-card:hover .arrow {
+            color: #00d4ff;
+            transform: translateX(4px);
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #00d4ff;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+            transition: gap 0.2s ease;
+        }
+
+        .back-btn:hover { gap: 0.8rem; }
+
+        /* hidden state sections */
+        .state-section { display: none; }
+        .state-section.active { display: block; }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: rgba(255,255,255,0.3);
+            font-size: 0.85rem;
+            border-top: 1px solid rgba(0,212,255,0.1);
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <h1>SS Grand Events</h1>
+            <ul>
+                <li><a href="index.html#home">Home</a></li>
+                <li><a href="index.html#services">Services</a></li>
+                <li><a href="index.html#hotels">Hotels</a></li>
+                <li><a href="index.html#about">About</a></li>
+                <li><a href="index.html#contact">Contact</a></li>
+                <li><a href="login.html" class="login-btn">Employee Login</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="page-hero">
+        <div class="breadcrumb">
+            <a href="index.html">Home</a> › <a href="index.html#hotels">Hotels</a> › <span id="breadcrumb-state">State</span>
+        </div>
+        <h1 id="page-title">Partner Hotels</h1>
+        <p id="page-subtitle">Select a place to explore hotels</p>
+    </div>
+
+    <div class="places-section">
+        <a href="index.html#hotels" class="back-btn">← Back to States</a>
+
+        <!-- Tamil Nadu -->
+        <div class="state-section" id="state-tamil-nadu">
+            <div class="places-grid">
+                <a href="hotel-detail.html?state=tamil-nadu&place=yercaud" class="place-card">
+                    <div class="place-img-placeholder">🏔️</div>
+                    <div class="place-info">
+                        <h3>Yercaud <span class="arrow">→</span></h3>
+                        <span class="hotel-count">8 Hotels</span>
+                    </div>
+                </a>
+                <a href="hotel-detail.html?state=tamil-nadu&place=kodaikanal" class="place-card">
+                    <div class="place-img-placeholder">🌿</div>
+                    <div class="place-info">
+                        <h3>Kodaikanal <span class="arrow">→</span></h3>
+                        <span class="hotel-count">1 Hotel</span>
+                    </div>
+                </a>
+                <a href="hotel-detail.html?state=tamil-nadu&place=coimbatore" class="place-card">
+                    <div class="place-img-placeholder">🏙️</div>
+                    <div class="place-info">
+                        <h3>Coimbatore <span class="arrow">→</span></h3>
+                        <span class="hotel-count">3 Hotels</span>
+                    </div>
+                </a>
+                <a href="hotel-detail.html?state=tamil-nadu&place=anakatti" class="place-card">
+                    <div class="place-img-placeholder">🌳</div>
+                    <div class="place-info">
+                        <h3>Anakatti <span class="arrow">→</span></h3>
+                        <span class="hotel-count">3 Hotels</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Karnataka -->
+        <div class="state-section" id="state-karnataka">
+            <div class="places-grid">
+                <a href="hotel-detail.html?state=karnataka&place=bangalore" class="place-card">
+                    <div class="place-img-placeholder">🏙️</div>
+                    <div class="place-info">
+                        <h3>Bangalore <span class="arrow">→</span></h3>
+                        <span class="hotel-count">26 Hotels</span>
+                    </div>
+                </a>
+                <a href="hotel-detail.html?state=karnataka&place=mysore" class="place-card">
+                    <div class="place-img-placeholder">🏰</div>
+                    <div class="place-info">
+                        <h3>Mysore <span class="arrow">→</span></h3>
+                        <span class="hotel-count">19 Hotels</span>
+                    </div>
+                </a>
+                <a href="hotel-detail.html?state=karnataka&place=coorg" class="place-card">
+                    <div class="place-img-placeholder">☕</div>
+                    <div class="place-info">
+                        <h3>Coorg <span class="arrow">→</span></h3>
+                        <span class="hotel-count">6 Hotels</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Kerala -->
+        <div class="state-section" id="state-kerala">
+            <div class="places-grid">
+                <a href="hotel-detail.html?state=kerala&place=kochi" class="place-card">
+                    <div class="place-img-placeholder">⛵</div>
+                    <div class="place-info">
+                        <h3>Kochi <span class="arrow">→</span></h3>
+                        <span class="hotel-count">47 Hotels</span>
+                    </div>
+                </a>
+                <a href="hotel-detail.html?state=kerala&place=thrissur" class="place-card">
+                    <div class="place-img-placeholder">🐘</div>
+                    <div class="place-info">
+                        <h3>Thrissur <span class="arrow">→</span></h3>
+                        <span class="hotel-count">14 Hotels</span>
+                    </div>
+                </a>
+                <a href="hotel-detail.html?state=kerala&place=thekkady" class="place-card">
+                    <div class="place-img-placeholder">🐯</div>
+                    <div class="place-info">
+                        <h3>Thekkady <span class="arrow">→</span></h3>
+                        <span class="hotel-count">10 Hotels</span>
+                    </div>
+                </a>
+                <a href="hotel-detail.html?state=kerala&place=munnar" class="place-card">
+                    <div class="place-img-placeholder">🍃</div>
+                    <div class="place-info">
+                        <h3>Munnar <span class="arrow">→</span></h3>
+                        <span class="hotel-count">14 Hotels</span>
+                    </div>
+                </a>
+                <a href="hotel-detail.html?state=kerala&place=palakkad" class="place-card">
+                    <div class="place-img-placeholder">🌾</div>
+                    <div class="place-info">
+                        <h3>Palakkad <span class="arrow">→</span></h3>
+                        <span class="hotel-count">3 Hotels</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Pondicherry -->
+        <div class="state-section" id="state-pondicherry">
+            <div class="places-grid">
+                <a href="hotel-detail.html?state=pondicherry&place=pondicherry" class="place-card">
+                    <div class="place-img-placeholder">🏖️</div>
+                    <div class="place-info">
+                        <h3>Pondicherry <span class="arrow">→</span></h3>
+                        <span class="hotel-count">29 Hotels</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Goa -->
+        <div class="state-section" id="state-goa">
+            <div class="places-grid">
+                <a href="hotel-detail.html?state=goa&place=goa" class="place-card">
+                    <div class="place-img-placeholder">🌊</div>
+                    <div class="place-info">
+                        <h3>Goa <span class="arrow">→</span></h3>
+                        <span class="hotel-count">Coming Soon</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Rajasthan -->
+        <div class="state-section" id="state-rajasthan">
+            <div class="places-grid">
+                <a href="hotel-detail.html?state=rajasthan&place=rajasthan" class="place-card">
+                    <div class="place-img-placeholder">🏜️</div>
+                    <div class="place-info">
+                        <h3>Rajasthan <span class="arrow">→</span></h3>
+                        <span class="hotel-count">Coming Soon</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Andhra Pradesh -->
+        <div class="state-section" id="state-andhra-pradesh">
+            <div class="places-grid">
+                <a href="hotel-detail.html?state=andhra-pradesh&place=andhra-pradesh" class="place-card">
+                    <div class="place-img-placeholder">🕌</div>
+                    <div class="place-info">
+                        <h3>Andhra Pradesh <span class="arrow">→</span></h3>
+                        <span class="hotel-count">Coming Soon</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+    <footer>&copy; 2024 SS Grand Events. All rights reserved.</footer>
+
+    <script>
+        const stateNames = {
+            'tamil-nadu': 'Tamil Nadu',
+            'karnataka': 'Karnataka',
+            'kerala': 'Kerala',
+            'pondicherry': 'Pondicherry',
+            'goa': 'Goa',
+            'rajasthan': 'Rajasthan',
+            'andhra-pradesh': 'Andhra Pradesh'
+        };
+
+        const params = new URLSearchParams(window.location.search);
+        const state = params.get('state') || 'tamil-nadu';
+        const stateName = stateNames[state] || state;
+
+        document.getElementById('breadcrumb-state').textContent = stateName;
+        document.getElementById('page-title').textContent = stateName;
+        document.getElementById('page-subtitle').textContent = 'Select a place to explore our partner hotels';
+
+        const section = document.getElementById('state-' + state);
+        if(section) section.classList.add('active');
+    </script>
+</body>
+</html>

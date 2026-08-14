@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotels - SS Grand Events</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body { background: linear-gradient(135deg, #0a0a1e 0%, #0d1b2a 100%); min-height: 100vh; }
+
+        .page-hero {
+            background: linear-gradient(135deg, #0a0a1e, #0d1b2a);
+            padding: 3rem 2rem 2rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(0,212,255,0.15);
+        }
+
+        .breadcrumb {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.4);
+            margin-bottom: 1rem;
+        }
+        .breadcrumb a { color: #00d4ff; text-decoration: none; }
+        .breadcrumb a:hover { text-decoration: underline; }
+
+        .page-hero h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #00d4ff, #0099ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-hero p { color: rgba(255,255,255,0.5); font-size: 1rem; }
+
+        .hotels-section {
+            padding: 3rem 2rem;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #00d4ff;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+            transition: gap 0.2s ease;
+        }
+        .back-btn:hover { gap: 0.8rem; }
+
+        .hotels-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        /* ── HOTEL CARD ── */
+        .hotel-card {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(0,212,255,0.15);
+            border-radius: 18px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .hotel-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(0,212,255,0.4);
+            box-shadow: 0 20px 50px rgba(0,212,255,0.12);
+        }
+
+        /* ── SLIDER ── */
+        .slider-wrap {
+            position: relative;
+            width: 100%;
+            height: 240px;
+            overflow: hidden;
+            background: #0a0a1e;
+        }
+
+        .slides-track {
+            display: flex;
+            height: 100%;
+            transition: transform 0.5s cubic-bezier(0.25,0.46,0.45,0.94);
+        }
+
+        .slide {
+            min-width: 100%;
+            height: 100%;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* placeholder when no image */
+        .slide-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #0d1b2a, #1a3a5c);
+            color: rgba(255,255,255,0.25);
+            font-size: 0.85rem;
+            gap: 0.5rem;
+        }
+
+        .slide-placeholder span { font-size: 2.5rem; }
+
+        /* image counter badge */
+        .img-counter {
+            position: absolute;
+            top: 10px;
+            right: 12px;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            font-size: 0.75rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            backdrop-filter: blur(4px);
+            z-index: 5;
+        }
+
+        /* prev/next */
+        .sl-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.5);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            font-size: 1rem;
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+            padding: 0;
+            min-width: unset;
+            margin: 0;
+            box-shadow: none;
+            opacity: 0;
+        }
+
+        .slider-wrap:hover .sl-btn { opacity: 1; }
+
+        .sl-btn:hover { background: rgba(0,212,255,0.8); box-shadow: none; transform: translateY(-50%) scale(1.1); }
+        .sl-btn.prev { left: 10px; }
+        .sl-btn.next { right: 10px; }
+
+        /* dots */
+        .sl-dots {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 6px;
+            z-index: 10;
+        }
+
+        .sl-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.4);
+            border: none;
+            padding: 0;
+            min-width: unset;
+            margin: 0;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: none;
+        }
+
+        .sl-dot.active {
+            background: #00d4ff;
+            transform: scale(1.4);
+            box-shadow: 0 0 6px rgba(0,212,255,0.7);
+        }
+
+        /* ── HOTEL INFO ── */
+        .hotel-info {
+            padding: 1.2rem 1.5rem 1.5rem;
+        }
+
+        .hotel-info h3 {
+            color: white;
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+            line-height: 1.3;
+        }
+
+        .hotel-place {
+            color: #00d4ff;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: rgba(255,255,255,0.3);
+            font-size: 0.85rem;
+            border-top: 1px solid rgba(0,212,255,0.1);
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="container">
+            <h1>SS Grand Events</h1>
+            <ul>
+                <li><a href="index.html#home">Home</a></li>
+                <li><a href="index.html#services">Services</a></li>
+                <li><a href="index.html#hotels">Hotels</a></li>
+                <li><a href="index.html#about">About</a></li>
+                <li><a href="index.html#contact">Contact</a></li>
+                <li><a href="login.html" class="login-btn">Employee Login</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="page-hero">
+        <div class="breadcrumb">
+            <a href="index.html">Home</a> ›
+            <a href="index.html#hotels">Hotels</a> ›
+            <a id="bc-state" href="#">State</a> ›
+            <span id="bc-place">Place</span>
+        </div>
+        <h1 id="page-title">Hotels</h1>
+        <p id="page-subtitle">Our partner hotels</p>
+    </div>
+
+    <div class="hotels-section">
+        <a id="back-btn" href="#" class="back-btn">← Back to Places</a>
+        <div class="hotels-grid" id="hotels-grid"></div>
+    </div>
+
+    <footer>&copy; 2024 SS Grand Events. All rights reserved.</footer>
+
+    <script>
+    // ── ALL HOTEL DATA ──
+    const HOTELS = {
+        'tamil-nadu': {
+            name: 'Tamil Nadu',
+            places: {
+                'yercaud': {
+                    name: 'Yercaud',
+                    hotels: ['GRAND SIGNATURE','TGI','KOLAGALAM','STERLING','SELVAMATHI SAFFRON','THE MAINLAND RESORT','CLIF VIEW RESORT','FOREST MEDOWS']
+                },
+                'kodaikanal': {
+                    name: 'Kodaikanal',
+                    hotels: ['The peak resort']
+                },
+                'coimbatore': {
+                    name: 'Coimbatore',
+                    hotels: ['Lemon tree','ITC coimbatore','Fairfield Marriot']
+                },
+                'anakatti': {
+                    name: 'Anakatti',
+                    hotels: ['My village','Tusker','Sterling']
+                }
+            }
+        },
+        'karnataka': {
+            name: 'Karnataka',
+            places: {
+                'bangalore': {
+                    name: 'Bangalore',
+                    hotels: ['RAMEE GUEST LINE','RK GARDENIA','TS ROYAL GRAND','SOUTH END BY TGI','FORTUNE JP','GOLD FINCH','VIVIDUS','ALTRUS','GOKULAM GRAND','GARDEN ASIA','ELIM RESORT','IBIS','SVENSKA','THE LALIT ASHOK','HOLLYDAG INN','HOWARD JHONSEN','COUNTRY IN BY RADISSON','THE CHANCHERY PAVILION','FIREFIELD BY MARRIOT','THE WAWERLY HOTEL','MGM MARK WHITE FIELD','LEMON TREE ULSOOR','LEMON TREE WHITEFILED','HOTEL DAVANAM SAROVER','RAMADA ENCORE','LAVENDER']
+                },
+                'mysore': {
+                    name: 'Mysore',
+                    hotels: ['COUNTRY MYSORE','JP PALACE','IBIS','ARCOR HOTEL','PAI VISTA','GRAND MERQRE','LE RUCHI','HOTEL MAYURA HOYSALA','HOTEL RUCHI PRINCE','EMARALD CLARKS','RIO MERIDIAN','HOTEL LE GRANDEUR','ROYAL ORCHID METROPOLE','HOTEL SANDESH PRINCE','THE ATRIUM BOTIQUE','THE QOUROM HOTEL','M PRO PALACE','MARIAH BOTIQUE HOTEL','GRAND SERENA']
+                },
+                'coorg': {
+                    name: 'Coorg',
+                    hotels: ['Hotel coorg palace inn','Hotel coorg Heights','Oxyrich business class hotel','Altitude coorg','Treebo regulia comfort','Coorg Heritage']
+                }
+            }
+        },
+        'kerala': {
+            name: 'Kerala',
+            places: {
+                'kochi': {
+                    name: 'Kochi',
+                    hotels: ['MARRIOT KOCHIN','NOVOTEL','FORTUNE','FOUR POINT SHERATON','HOLIDAY INN','KEY SELECT BY LEMON TREE','IBIS KOCHIN','CASINO','CORAL REEF','RAMADA BY WYNDHAM','RAAS RESIDENCY','MARITIME KOCHI','Trident Hotel Cochin','The Avenue Regent','Sugar Business Hotel','Le Meridien Kochi','GRAND HOTEL','HOTEL PALMYRA GRAND','GINGER MG ROAD','HOTEL KOCHI LEGACY','MILLENNIUM CONTINENTAL','NM ROYALECOUNTY','LUMINARA','SIDRA PRISTINE HOTEL','RETRIEVE HEALTH AND WELLNESS','D MIRAGE','PGS VEDANTA','LE MARITIME','OLIVE DOWNTOWN','AVANUE REGANT','RADISSION BLU','TIROS HOTELS','HOTEL FORT QUEEN','ABAAM HOTEL','GOKULAM GRAND','FLORA CHARISHMA','TRAVAN CORE COURT','AURA ONE HOTEL','YUVARANI RECIDENCY','ABAD COCHI - CHULLIKAL','THE MERCY LUXURY BUSINESS','SPAN INTERNATIONAL','KENT BAYWATCH SUITES','THE CABANA','MEZKAR RECIDENCY','SEALAGOON HEALTH RESORT','BOARD BEAN COCHI']
+                },
+                'thrissur': {
+                    name: 'Thrissur',
+                    hotels: ['HOTEL NIYA REGENCY','DASS CONTINENTAL','JOYS PALACE','HOTEL ASHOKA IN','PARK IN BY RADISSON','THE GARUDA','HOTEL MERLIN INTERNATIONAL','HAYATT REGENCY','CASINO HOTEL LTD','LUMBINI SUPREME BUSINESS','TRICHUR TOWERS','ZIP BY SPREE MANGLA TOWER','HOTEL SAVERA PARK','SMART RESIDENCY']
+                },
+                'thekkady': {
+                    name: 'Thekkady',
+                    hotels: ['WOODNOTE','STERLING','JUNGLE PARK RESORT','HOTEL TIGERS ROARE','HOTEL LINCOLN SQURE','TIGER TRAILS','HOTEL LAKESHORE INN','GRAND GLORY TOURIST','GOKUL RESIDENCY','LIVINS THEKKEDY']
+                },
+                'munnar': {
+                    name: 'Munnar',
+                    hotels: ['CARAMEL TOP RESORT','ARUL MOUNT','ISSACS RESIDENCY','GREEN RIDGE','SILVER TIPS RESORT','HOTEL WHITE HOUSE','LUMINO DWELLING','GRAND PLAZA','RED SPARROW HOTELS','HOTEL HILLVIEW','CASA MONTANA','CLOUDS VALLEY LEISURE','MAXMUNNAR','ELISYUM GARDENS']
+                },
+                'palakkad': {
+                    name: 'Palakkad',
+                    hotels: ['Sterling','Tripenta','Districk nine']
+                }
+            }
+        },
+        'pondicherry': {
+            name: 'Pondicherry',
+            places: {
+                'pondicherry': {
+                    name: 'Pondicherry',
+                    hotels: ['Le Royal Park','Annamali international','Sivakavi hotel','Accord Pondi','Ratan hotel pondi','Anandha inn','Shenbaga','Hotel Atithi','Sands Point','Residency Tower','Ginger','mango hills auroville','james court','Nalla beach','Ashok Beach resort','seaborne beach','ocean spray','K Resort','Mango hill hotel shadow','king avarta resort','Hidden Bay','Sunway manor','Radisson','Lagoon Sarovar de pondy','le pondy','RKN Beach Resort','The Shore Thirshvam','Mango hill la serene','Shallow beach resorts']
+                }
+            }
+        }
+    };
+
+    // ── IMAGE MAP ──
+    // To add images: add folder path like hotel-images/tamil-nadu/yercaud/grand-signature/
+    // Files: 1.jpg, 2.jpg, 3.jpg etc.
+    // Format: 'hotel-slug': ['path1','path2','path3']
+    const HOTEL_IMAGES = {
+        // Example (uncomment and fill when you upload):
+        // 'grand-signature': ['hotel-images/tamil-nadu/yercaud/grand-signature/1.jpg','hotel-images/tamil-nadu/yercaud/grand-signature/2.jpg'],
+    };
+
+    function slugify(str) {
+        return str.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    }
+
+    function buildSlider(hotelName, place, state) {
+        const slug = slugify(hotelName);
+        const images = HOTEL_IMAGES[slug] || [];
+
+        let slidesHtml = '';
+        let dotsHtml = '';
+
+        if(images.length > 0) {
+            images.forEach((src, i) => {
+                slidesHtml += `<div class="slide"><img src="${src}" alt="${hotelName}" loading="lazy"></div>`;
+                dotsHtml += `<button class="sl-dot ${i===0?'active':''}" data-index="${i}"></button>`;
+            });
+        } else {
+            // Placeholder — ready for images
+            slidesHtml = `
+                <div class="slide">
+                    <div class="slide-placeholder">
+                        <span>🏨</span>
+                        <p>Photos coming soon</p>
+                    </div>
+                </div>`;
+            dotsHtml = `<button class="sl-dot active" data-index="0"></button>`;
+        }
+
+        const count = images.length > 0 ? `${images.length} photo${images.length>1?'s':''}` : '';
+
+        return `
+            <div class="slider-wrap" data-slider>
+                ${count ? `<div class="img-counter">${count}</div>` : ''}
+                <div class="slides-track">${slidesHtml}</div>
+                ${images.length > 1 ? `
+                <button class="sl-btn prev" onclick="slide(this,-1)">&#10094;</button>
+                <button class="sl-btn next" onclick="slide(this,1)">&#10095;</button>` : ''}
+                <div class="sl-dots">${dotsHtml}</div>
+            </div>`;
+    }
+
+    function renderHotels(state, place, placeData) {
+        const grid = document.getElementById('hotels-grid');
+        grid.innerHTML = placeData.hotels.map(hotel => `
+            <div class="hotel-card">
+                ${buildSlider(hotel, place, state)}
+                <div class="hotel-info">
+                    <h3>${hotel}</h3>
+                    <div class="hotel-place">📍 ${placeData.name}</div>
+                </div>
+            </div>
+        `).join('');
+
+        // Init sliders
+        document.querySelectorAll('[data-slider]').forEach(initSlider);
+    }
+
+    function initSlider(slider) {
+        const track = slider.querySelector('.slides-track');
+        const dots = slider.querySelectorAll('.sl-dot');
+        if(!track || dots.length <= 1) return;
+
+        let cur = 0;
+        let timer;
+
+        function goTo(i) {
+            cur = (i + dots.length) % dots.length;
+            track.style.transform = `translateX(-${cur * 100}%)`;
+            dots.forEach((d,idx) => d.classList.toggle('active', idx === cur));
+        }
+
+        dots.forEach((d,i) => d.addEventListener('click', () => { goTo(i); resetTimer(); }));
+        slider._goTo = goTo;
+        slider._getCur = () => cur;
+
+        function resetTimer() { clearInterval(timer); timer = setInterval(() => goTo(cur+1), 4000); }
+        slider.addEventListener('mouseenter', () => clearInterval(timer));
+        slider.addEventListener('mouseleave', resetTimer);
+        resetTimer();
+    }
+
+    function slide(btn, dir) {
+        const slider = btn.closest('[data-slider]');
+        slider._goTo(slider._getCur() + dir);
+    }
+
+    // ── INIT PAGE ──
+    const params = new URLSearchParams(window.location.search);
+    const stateKey = params.get('state');
+    const placeKey = params.get('place');
+
+    const stateData = HOTELS[stateKey];
+    const placeData = stateData?.places[placeKey];
+
+    if(stateData && placeData) {
+        document.title = `${placeData.name} Hotels - SS Grand Events`;
+        document.getElementById('bc-state').textContent = stateData.name;
+        document.getElementById('bc-state').href = `hotels.html?state=${stateKey}`;
+        document.getElementById('bc-place').textContent = placeData.name;
+        document.getElementById('page-title').textContent = `${placeData.name} Hotels`;
+        document.getElementById('page-subtitle').textContent = `${placeData.hotels.length} partner hotels in ${placeData.name}`;
+        document.getElementById('back-btn').href = `hotels.html?state=${stateKey}`;
+        renderHotels(stateKey, placeKey, placeData);
+    }
+    </script>
+</body>
+</html>
