@@ -358,18 +358,31 @@
     // To add images: add folder path like hotel-images/tamil-nadu/yercaud/grand-signature/
     // Files: 1.jpg, 2.jpg, 3.jpg etc.
     // Format: 'hotel-slug': ['path1','path2','path3']
-    const HOTEL_IMAGES = {
-        // Example (uncomment and fill when you upload):
-        // 'grand-signature': ['hotel-images/tamil-nadu/yercaud/grand-signature/1.jpg','hotel-images/tamil-nadu/yercaud/grand-signature/2.jpg'],
+    // Shared place-level images shown for all hotels in that place
+    // Structure: place key -> array of image paths
+    const PLACE_IMAGES = {
+        'yercaud':      ['hotel-images/tamil-nadu/yercaud/1.jpg','hotel-images/tamil-nadu/yercaud/2.jpg'],
+        'kodaikanal':   ['hotel-images/tamil-nadu/kodaikanal/1.jpg'],
+        'coimbatore':   ['hotel-images/tamil-nadu/coimbatore/1.jpg'],
+        'anakatti':     ['hotel-images/tamil-nadu/anakatti/1.jpg'],
+        'bangalore':    ['hotel-images/karnataka/bangalore/1.jpg','hotel-images/karnataka/bangalore/2.jpg'],
+        'mysore':       ['hotel-images/karnataka/mysore/1.jpg','hotel-images/karnataka/mysore/2.jpg'],
+        'coorg':        ['hotel-images/karnataka/coorg/1.jpg'],
+        'kochi':        ['hotel-images/kerala/kochi/1.jpg','hotel-images/kerala/kochi/2.jpg'],
+        'thrissur':     ['hotel-images/kerala/thrissur/1.jpg'],
+        'thekkady':     ['hotel-images/kerala/thekkady/1.jpg'],
+        'munnar':       ['hotel-images/kerala/munnar/1.jpg','hotel-images/kerala/munnar/2.jpg'],
+        'palakkad':     ['hotel-images/kerala/palakkad/1.jpg'],
+        'pondicherry':  ['hotel-images/pondicherry/pondicherry/1.jpg','hotel-images/pondicherry/pondicherry/2.jpg']
     };
+    const HOTEL_IMAGES = {};
 
     function slugify(str) {
         return str.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
     }
 
     function buildSlider(hotelName, place, state) {
-        const slug = slugify(hotelName);
-        const images = HOTEL_IMAGES[slug] || [];
+        const images = PLACE_IMAGES[place] || HOTEL_IMAGES[slugify(hotelName)] || [];
 
         let slidesHtml = '';
         let dotsHtml = '';
