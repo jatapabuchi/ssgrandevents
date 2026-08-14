@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hotels - SS Grand Events</title>
-    <link rel="stylesheet" href="css/styles.css">>
+    <link rel="stylesheet" href="css/styles.css">
     <style>
         body { background: linear-gradient(135deg, #0a0a1e 0%, #0d1b2a 100%); min-height: 100vh; }
 
@@ -482,18 +482,27 @@
         }
     };
 
-    let MANIFEST = {};
+    const MAX_IMAGES = 30;
 
     function slugify(str) {
         return str.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
     }
 
-    function getHotelImages(state, place, hotelName) {
-        const key = `${state}/${place}/${slugify(hotelName)}`;
-        return MANIFEST[key] || [];
+    function getImagePaths(state, place, hotelName) {
+        const base = `hotel-images/${state}/${place}/${slugify(hotelName)}`;
+        return Array.from({length: MAX_IMAGES}, (_, i) => `${base}/image${i+1}.jpg`);
     }
 
-    function buildSlider(hotelName, place, state, images) {
+    function probeImages(paths) {
+        return Promise.all(paths.map(src => new Promise(resolve => {
+            const img = new Image();
+            img.onload = () => resolve(src);
+            img.onerror = () => resolve(null);
+            img.src = src;
+        }))).then(results => results.filter(Boolean));
+    }
+
+    function buildSlider(hotelName, images) {
         let slidesHtml = '', dotsHtml = '';
         if (images.length > 0) {
             images.forEach((src, i) => {
@@ -516,21 +525,29 @@
             </div>`;
     }
 
+    function renderHotelCard(grid, hotel, place, state, images) {
+        const hasImages = images.length > 0;
+        const card = document.createElement('div');
+        card.className = `hotel-card ${hasImages ? 'has-images' : ''}`;
+        card.innerHTML = `
+            ${buildSlider(hotel, images)}
+            <div class="hotel-info">
+                <h3>${hotel}</h3>
+                <div class="hotel-place">📍 ${place}</div>
+            </div>`;
+        if (hasImages) card.onclick = () => openLightbox(hotel, images);
+        grid.appendChild(card);
+        card.querySelectorAll('[data-slider]').forEach(initSlider);
+    }
+
     function renderHotels(state, place, placeData) {
         const grid = document.getElementById('hotels-grid');
-        grid.innerHTML = placeData.hotels.map(hotel => {
-            const images = getHotelImages(state, place, hotel);
-            const hasImages = images.length > 0;
-            return `
-            <div class="hotel-card ${hasImages ? 'has-images' : ''}" onclick="openLightbox('${hotel.replace(/'/g,"\\'")}',${ JSON.stringify(images) })">
-                ${buildSlider(hotel, place, state, images)}
-                <div class="hotel-info">
-                    <h3>${hotel}</h3>
-                    <div class="hotel-place">📍 ${placeData.name}</div>
-                </div>
-            </div>`;
-        }).join('');
-        document.querySelectorAll('[data-slider]').forEach(initSlider);
+        grid.innerHTML = '';
+        placeData.hotels.forEach(hotel => {
+            probeImages(getImagePaths(state, place, hotel)).then(images => {
+                renderHotelCard(grid, hotel, placeData.name, state, images);
+            });
+        });
     }
 
     // ── LIGHTBOX ──
@@ -634,14 +651,7 @@
         document.getElementById('page-subtitle').textContent = `${placeData.hotels.length} partner hotels in ${placeData.name}`;
         document.getElementById('back-btn').href = `hotels.html?state=${stateKey}`;
 
-        // Load manifest then render
-        fetch('image-manifest.json?v=' + Date.now())
-            .then(r => r.ok ? r.json() : {})
-            .catch(() => ({}))
-            .then(manifest => {
-                MANIFEST = manifest;
-                renderHotels(stateKey, placeKey, placeData);
-            });
+        renderHotels(stateKey, placeKey, placeData);
     }
     </script>
 </body>
