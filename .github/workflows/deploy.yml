@@ -30,6 +30,8 @@ jobs:
             --exclude "*.md" \
             --exclude "*.xlsx" \
             --exclude "*.gitkeep" \
+            --exclude "ghcli/*" \
+            --exclude "docs/*" \
             --delete \
             --cache-control "max-age=86400"
 
