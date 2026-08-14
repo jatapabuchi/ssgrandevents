@@ -1,0 +1,6 @@
+# All files require owner approval by default
+* @jatapabuchi
+
+# hotel-images/ can be modified by employee without owner review
+# (owner still approves via PR merge)
+hotel-images/ @jatapabuchi

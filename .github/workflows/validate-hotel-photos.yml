@@ -1,0 +1,46 @@
+name: Validate Hotel Photos PR
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  check-files:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check only hotel-images/ files changed
+        run: |
+          CHANGED=$(git diff --name-only origin/main...HEAD)
+          echo "Changed files:"
+          echo "$CHANGED"
+
+          INVALID=$(echo "$CHANGED" | grep -v '^hotel-images/' || true)
+
+          if [ -n "$INVALID" ]; then
+            echo ""
+            echo "❌ ERROR: Changes outside hotel-images/ are not allowed in this PR:"
+            echo "$INVALID"
+            exit 1
+          fi
+
+          echo "✅ All changes are inside hotel-images/ — OK"
+
+      - name: Check only image files
+        run: |
+          CHANGED=$(git diff --name-only origin/main...HEAD)
+          NON_IMAGE=$(echo "$CHANGED" | grep -vE '\.(jpg|jpeg|png|webp|gif|JPG|JPEG|PNG|WEBP)$' | grep -v '\.gitkeep$' || true)
+
+          if [ -n "$NON_IMAGE" ]; then
+            echo ""
+            echo "❌ ERROR: Only image files (jpg, png, webp) are allowed:"
+            echo "$NON_IMAGE"
+            exit 1
+          fi
+
+          echo "✅ All files are valid image types — OK"
