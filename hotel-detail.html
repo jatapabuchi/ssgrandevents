@@ -241,6 +241,118 @@
             border-top: 1px solid rgba(0,212,255,0.1);
             margin-top: 2rem;
         }
+
+        /* ── HOTEL CARD CLICK ── */
+        .hotel-card { cursor: pointer; }
+        .has-images .hotel-info h3::after {
+            content: ' 🖼️';
+            font-size: 0.8rem;
+        }
+
+        /* ── LIGHTBOX ── */
+        #lightbox {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 1000;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        #lightbox.open { display: flex; }
+
+        #lb-header {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+        }
+        #lb-title { color: white; font-size: 1.1rem; font-weight: 700; }
+        #lb-counter { color: rgba(255,255,255,0.6); font-size: 0.9rem; }
+        #lb-close {
+            color: white; font-size: 2rem; cursor: pointer;
+            background: none; border: none; line-height: 1;
+            padding: 0; min-width: unset;
+        }
+
+        #lb-img-wrap {
+            max-width: 92vw;
+            max-height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #lb-img {
+            max-width: 92vw;
+            max-height: 80vh;
+            object-fit: contain;
+            border-radius: 8px;
+            transition: opacity 0.25s ease;
+        }
+        #lb-img.fade { opacity: 0; }
+
+        .lb-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.15);
+            border: none;
+            color: white;
+            font-size: 2rem;
+            width: 52px; height: 52px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s;
+            padding: 0; min-width: unset;
+        }
+        .lb-nav:hover { background: rgba(0,212,255,0.6); }
+        #lb-prev { left: 1rem; }
+        #lb-next { right: 1rem; }
+
+        #lb-dots {
+            position: absolute;
+            bottom: 1.5rem;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 80vw;
+        }
+        .lb-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            border: none; cursor: pointer;
+            padding: 0; min-width: unset;
+            transition: all 0.2s;
+        }
+        .lb-dot.active { background: #00d4ff; transform: scale(1.4); }
+
+        #lb-thumbnails {
+            position: absolute;
+            bottom: 3.5rem;
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            max-width: 90vw;
+            padding: 0.5rem;
+        }
+        .lb-thumb {
+            width: 60px; height: 45px;
+            object-fit: cover;
+            border-radius: 4px;
+            cursor: pointer;
+            opacity: 0.5;
+            border: 2px solid transparent;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+        .lb-thumb.active { opacity: 1; border-color: #00d4ff; }
     </style>
 </head>
 <body>
@@ -276,6 +388,22 @@
     </div>
 
     <footer>&copy; 2024 SS Grand Events. All rights reserved.</footer>
+
+    <!-- LIGHTBOX -->
+    <div id="lightbox">
+        <div id="lb-header">
+            <span id="lb-title"></span>
+            <span id="lb-counter"></span>
+            <button id="lb-close" onclick="closeLightbox()">✕</button>
+        </div>
+        <div id="lb-img-wrap">
+            <img id="lb-img" src="" alt="">
+        </div>
+        <button class="lb-nav" id="lb-prev" onclick="lbNav(-1)">&#10094;</button>
+        <button class="lb-nav" id="lb-next" onclick="lbNav(1)">&#10095;</button>
+        <div id="lb-thumbnails"></div>
+        <div id="lb-dots"></div>
+    </div>
 
     <script>
     // ── ALL HOTEL DATA ──
@@ -354,85 +482,111 @@
         }
     };
 
-    // ── IMAGE MAP ──
-    // To add images: add folder path like hotel-images/tamil-nadu/yercaud/grand-signature/
-    // Files: 1.jpg, 2.jpg, 3.jpg etc.
-    // Format: 'hotel-slug': ['path1','path2','path3']
-    // Shared place-level images shown for all hotels in that place
-    // Structure: place key -> array of image paths
-    const PLACE_IMAGES = {
-        'yercaud':      ['hotel-images/tamil-nadu/yercaud/_cover/1.jpg','hotel-images/tamil-nadu/yercaud/_cover/2.jpg'],
-        'kodaikanal':   ['hotel-images/tamil-nadu/kodaikanal/_cover/1.jpg'],
-        'coimbatore':   ['hotel-images/tamil-nadu/coimbatore/_cover/1.jpg'],
-        'anakatti':     ['hotel-images/tamil-nadu/anakatti/_cover/1.jpg'],
-        'bangalore':    ['hotel-images/karnataka/bangalore/_cover/1.jpg','hotel-images/karnataka/bangalore/_cover/2.jpg'],
-        'mysore':       ['hotel-images/karnataka/mysore/_cover/1.jpg','hotel-images/karnataka/mysore/_cover/2.jpg'],
-        'coorg':        ['hotel-images/karnataka/coorg/_cover/1.jpg'],
-        'kochi':        ['hotel-images/kerala/kochi/_cover/1.jpg','hotel-images/kerala/kochi/_cover/2.jpg'],
-        'thrissur':     ['hotel-images/kerala/thrissur/_cover/1.jpg'],
-        'thekkady':     ['hotel-images/kerala/thekkady/_cover/1.jpg'],
-        'munnar':       ['hotel-images/kerala/munnar/_cover/1.jpg','hotel-images/kerala/munnar/_cover/2.jpg'],
-        'palakkad':     ['hotel-images/kerala/palakkad/_cover/1.jpg'],
-        'pondicherry':  ['hotel-images/pondicherry/pondicherry/_cover/1.jpg','hotel-images/pondicherry/pondicherry/_cover/2.jpg']
-    };
-    // Per-hotel images: add entry as 'hotel-slug': ['hotel-images/state/place/hotel-slug/1.jpg', ...]
-    const HOTEL_IMAGES = {};
+    let MANIFEST = {};
 
     function slugify(str) {
         return str.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
     }
 
-    function buildSlider(hotelName, place, state) {
-        const images = PLACE_IMAGES[place] || HOTEL_IMAGES[slugify(hotelName)] || [];
+    function getHotelImages(state, place, hotelName) {
+        const key = `${state}/${place}/${slugify(hotelName)}`;
+        return MANIFEST[key] || [];
+    }
 
-        let slidesHtml = '';
-        let dotsHtml = '';
-
-        if(images.length > 0) {
+    function buildSlider(hotelName, place, state, images) {
+        let slidesHtml = '', dotsHtml = '';
+        if (images.length > 0) {
             images.forEach((src, i) => {
                 slidesHtml += `<div class="slide"><img src="${src}" alt="${hotelName}" loading="lazy"></div>`;
                 dotsHtml += `<button class="sl-dot ${i===0?'active':''}" data-index="${i}"></button>`;
             });
         } else {
-            // Placeholder — ready for images
-            slidesHtml = `
-                <div class="slide">
-                    <div class="slide-placeholder">
-                        <span>🏨</span>
-                        <p>Photos coming soon</p>
-                    </div>
-                </div>`;
+            slidesHtml = `<div class="slide"><div class="slide-placeholder"><span>🏨</span><p>Photos coming soon</p></div></div>`;
             dotsHtml = `<button class="sl-dot active" data-index="0"></button>`;
         }
-
         const count = images.length > 0 ? `${images.length} photo${images.length>1?'s':''}` : '';
-
         return `
             <div class="slider-wrap" data-slider>
                 ${count ? `<div class="img-counter">${count}</div>` : ''}
                 <div class="slides-track">${slidesHtml}</div>
                 ${images.length > 1 ? `
-                <button class="sl-btn prev" onclick="slide(this,-1)">&#10094;</button>
-                <button class="sl-btn next" onclick="slide(this,1)">&#10095;</button>` : ''}
+                <button class="sl-btn prev" onclick="event.stopPropagation();slide(this,-1)">&#10094;</button>
+                <button class="sl-btn next" onclick="event.stopPropagation();slide(this,1)">&#10095;</button>` : ''}
                 <div class="sl-dots">${dotsHtml}</div>
             </div>`;
     }
 
     function renderHotels(state, place, placeData) {
         const grid = document.getElementById('hotels-grid');
-        grid.innerHTML = placeData.hotels.map(hotel => `
-            <div class="hotel-card">
-                ${buildSlider(hotel, place, state)}
+        grid.innerHTML = placeData.hotels.map(hotel => {
+            const images = getHotelImages(state, place, hotel);
+            const hasImages = images.length > 0;
+            return `
+            <div class="hotel-card ${hasImages ? 'has-images' : ''}" onclick="openLightbox('${hotel.replace(/'/g,"\\'")}',${ JSON.stringify(images) })">
+                ${buildSlider(hotel, place, state, images)}
                 <div class="hotel-info">
                     <h3>${hotel}</h3>
                     <div class="hotel-place">📍 ${placeData.name}</div>
                 </div>
-            </div>
-        `).join('');
-
-        // Init sliders
+            </div>`;
+        }).join('');
         document.querySelectorAll('[data-slider]').forEach(initSlider);
     }
+
+    // ── LIGHTBOX ──
+    let lbImages = [], lbIndex = 0;
+
+    function openLightbox(name, images) {
+        if (!images || images.length === 0) return;
+        lbImages = images;
+        lbIndex = 0;
+        document.getElementById('lb-title').textContent = name;
+        buildThumbnails();
+        lbShow(0);
+        document.getElementById('lightbox').classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+        document.getElementById('lightbox').classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    function lbShow(i) {
+        lbIndex = (i + lbImages.length) % lbImages.length;
+        const img = document.getElementById('lb-img');
+        img.classList.add('fade');
+        setTimeout(() => {
+            img.src = lbImages[lbIndex];
+            img.classList.remove('fade');
+        }, 150);
+        document.getElementById('lb-counter').textContent = `${lbIndex + 1} / ${lbImages.length}`;
+        document.querySelectorAll('.lb-thumb').forEach((t,i) => t.classList.toggle('active', i === lbIndex));
+        document.querySelectorAll('.lb-dot').forEach((d,i) => d.classList.toggle('active', i === lbIndex));
+    }
+
+    function lbNav(dir) { lbShow(lbIndex + dir); }
+
+    function buildThumbnails() {
+        document.getElementById('lb-thumbnails').innerHTML = lbImages.map((src,i) =>
+            `<img class="lb-thumb ${i===0?'active':''}" src="${src}" onclick="lbShow(${i})">`
+        ).join('');
+        document.getElementById('lb-dots').innerHTML = lbImages.length > 1 ? lbImages.map((_,i) =>
+            `<button class="lb-dot ${i===0?'active':''}" onclick="lbShow(${i})"></button>`
+        ).join('') : '';
+    }
+
+    // keyboard nav
+    document.addEventListener('keydown', e => {
+        if (!document.getElementById('lightbox').classList.contains('open')) return;
+        if (e.key === 'ArrowRight') lbNav(1);
+        else if (e.key === 'ArrowLeft') lbNav(-1);
+        else if (e.key === 'Escape') closeLightbox();
+    });
+    // click outside image to close
+    document.getElementById('lightbox').addEventListener('click', e => {
+        if (e.target === document.getElementById('lightbox')) closeLightbox();
+    });
 
     function initSlider(slider) {
         const track = slider.querySelector('.slides-track');
@@ -479,7 +633,15 @@
         document.getElementById('page-title').textContent = `${placeData.name} Hotels`;
         document.getElementById('page-subtitle').textContent = `${placeData.hotels.length} partner hotels in ${placeData.name}`;
         document.getElementById('back-btn').href = `hotels.html?state=${stateKey}`;
-        renderHotels(stateKey, placeKey, placeData);
+
+        // Load manifest then render
+        fetch('image-manifest.json?v=' + Date.now())
+            .then(r => r.ok ? r.json() : {})
+            .catch(() => ({}))
+            .then(manifest => {
+                MANIFEST = manifest;
+                renderHotels(stateKey, placeKey, placeData);
+            });
     }
     </script>
 </body>

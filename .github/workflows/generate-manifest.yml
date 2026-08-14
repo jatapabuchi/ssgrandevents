@@ -1,0 +1,63 @@
+name: Generate Image Manifest
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'hotel-images/**'
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate image-manifest.json
+        run: |
+          python3 -c "
+          import os, json
+          manifest = {}
+          base = 'hotel-images'
+          img_exts = {'.jpg','.jpeg','.png','.webp','.gif'}
+          for state in sorted(os.listdir(base)):
+            sp = os.path.join(base, state)
+            if not os.path.isdir(sp): continue
+            for place in sorted(os.listdir(sp)):
+              pp = os.path.join(sp, place)
+              if not os.path.isdir(pp): continue
+              for hotel in sorted(os.listdir(pp)):
+                hp = os.path.join(pp, hotel)
+                if not os.path.isdir(hp) or hotel == '_cover': continue
+                imgs = sorted([
+                  f'{base}/{state}/{place}/{hotel}/{f}'
+                  for f in os.listdir(hp)
+                  if os.path.splitext(f)[1].lower() in img_exts
+                ])
+                if imgs:
+                  key = f'{state}/{place}/{hotel}'
+                  manifest[key] = imgs
+          with open('image-manifest.json','w') as f:
+            json.dump(manifest, f)
+          print(f'Generated manifest with {len(manifest)} hotels')
+          "
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-south-1
+
+      - name: Upload manifest + images to S3
+        run: |
+          aws s3 cp image-manifest.json s3://ssgrandevents-frontend-399760685306/image-manifest.json \
+            --cache-control "no-cache, no-store, must-revalidate"
+          aws s3 sync hotel-images/ s3://ssgrandevents-frontend-399760685306/hotel-images/ \
+            --exclude ".gitkeep" \
+            --cache-control "max-age=86400"
+
+      - name: Invalidate CloudFront
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id E296V9JDW6WKKR \
+            --paths "/image-manifest.json" "/hotel-images/*"
