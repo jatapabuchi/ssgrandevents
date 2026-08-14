@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - SSGrandEvents</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .dashboard-nav {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            padding: 0.6rem 1rem;
+            border: none;
+            background: #f0f0f0;
+            cursor: pointer;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            color: #666;
+            font-size: 0.85rem;
+            flex: 1;
+            min-width: 100px;
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(135deg, #00d4ff, #0099ff);
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .greyed-out {
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .section-header h2 {
+            margin: 0;
+            font-size: 1.3rem;
+        }
+
+        .filters {
+            background: #f9f9f9;
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+            color: #333;
+            font-size: 0.8rem;
+        }
+
+        .filter-group input,
+        .filter-group select {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            border-left: 4px solid #00d4ff;
+        }
+
+        .stat-card h4 {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card p {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #00d4ff;
+        }
+
+        .action-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .edit-btn {
+            background: #00d4ff;
+            color: white;
+        }
+
+        .edit-btn:hover {
+            background: #0099ff;
+        }
+
+        .delete-btn {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background: #ff5252;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 0.6rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .form-actions button {
+            flex: 1;
+            padding: 0.8rem;
+        }
+
+        .secondary-btn {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .secondary-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .events-table {
+            background: white;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            margin-bottom: 1rem;
+        }
+
+        .events-table h3 {
+            padding: 1rem;
+            background: #f9f9f9;
+            margin: 0;
+            border-bottom: 1px solid #eee;
+            font-size: 1.1rem;
+        }
+
+        .events-table table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .events-table th,
+        .events-table td {
+            padding: 0.6rem 0.5rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .payment-paid {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .payment-partial {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .payment-unpaid {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .field-hint {
+            font-size: 0.8rem;
+            color: #666;
+            font-weight: normal;
+        }
+
+        .error-msg {
+            color: #dc3545;
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .error-msg.show {
+            display: block;
+        }
+
+        .form-group input.error,
+        .form-group select.error {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+        }
+
+        .validation-summary {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .validation-summary.show {
+            display: block;
+        }
+
+        .validation-summary ul {
+            margin: 0;
+            padding-left: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 0.5rem;
+            }
+            
+            .filter-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .dashboard-nav {
+                gap: 0.3rem;
+            }
+            
+            .nav-btn {
+                padding: 0.5rem 0.7rem;
+                font-size: 0.8rem;
+            }
+            
+            .header-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .events-table {
+                font-size: 0.85rem;
+            }
+            
+            .action-btn {
+                padding: 0.4rem 0.6rem;
+                font-size: 0.75rem;
+            }
+        }
+
+        /* Zoho Books-like Advanced Styles */
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .view-controls {
+            display: flex;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .view-btn {
+            padding: 0.5rem 0.8rem;
+            border: none;
+            background: #f8f9fa;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.2s;
+        }
+
+        .view-btn.active {
+            background: #00d4ff;
+            color: white;
+        }
+
+        .view-btn:hover {
+            background: #e9ecef;
+        }
+
+        .view-btn.active:hover {
+            background: #0099ff;
+        }
+
+        .action-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .filter-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .filter-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #eee;
+        }
+
+        .results-info {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .date-range {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .date-range input {
+            flex: 1;
+        }
+
+        .view-content {
+            display: none;
+        }
+
+        .view-content.active {
+            display: block;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            background: #f9f9f9;
+            border-bottom: 1px solid #eee;
+        }
+
+        .table-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .sortable {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .sortable:hover {
+            background: #f0f0f0;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            border-top: 1px solid #eee;
+        }
+
+        .page-btn {
+            padding: 0.5rem 0.8rem;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .page-btn.active {
+            background: #00d4ff;
+            color: white;
+            border-color: #00d4ff;
+        }
+
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            padding: 1.5rem;
+        }
+
+        .booking-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 4px solid #00d4ff;
+            transition: transform 0.2s;
+        }
+
+        .booking-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #333;
+        }
+
+        .card-date {
+            font-size: 0.9rem;
+            color: #666;
+            background: #f0f0f0;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .card-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .card-detail {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: #f9f9f9;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background: #ddd;
+            border-radius: 0 0 8px 8px;
+            overflow: hidden;
+        }
+
+        .calendar-day {
+            background: white;
+            min-height: 100px;
+            padding: 0.5rem;
+            position: relative;
+        }
+
+        .calendar-day.other-month {
+            background: #f8f9fa;
+            color: #999;
+        }
+
+        .calendar-day.today {
+            background: #e3f2fd;
+        }
+
+        .calendar-event {
+            background: #00d4ff;
+            color: white;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-size: 0.75rem;
+            margin-bottom: 0.2rem;
+            cursor: pointer;
+        }
+
+        .bulk-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .status-confirmed { background: #d4edda; color: #155724; }
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-completed { background: #cce5ff; color: #004085; }
+        .status-cancelled { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <h1>SSGrandEvents Dashboard</h1>
+            <div>
+                <button onclick="logout()" class="primary-btn">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container dashboard">
+        <div class="dashboard-nav">
+            <button class="nav-btn active" onclick="switchTab('dashboard')">📊 Dashboard</button>
+            <button class="nav-btn" onclick="switchTab('bookings')">📅 Bookings</button>
+            <button class="nav-btn" onclick="switchTab('hotels')">🏨 Hotels</button>
+            <button class="nav-btn" onclick="switchTab('users')">👥 Users</button>
+        </div>
+
+        <!-- Dashboard Tab -->
+        <div id="dashboard-tab" class="tab-content active">
+            <div class="section-header">
+                <h2>Dashboard Analytics</h2>
+            </div>
+
+            <div class="filters">
+                <div class="filter-group">
+                    <label>Date From</label>
+                    <input type="date" id="dash-date-from" onchange="loadDashboard()">
+                </div>
+                <div class="filter-group">
+                    <label>Date To</label>
+                    <input type="date" id="dash-date-to" onchange="loadDashboard()">
+                </div>
+                <div class="filter-group">
+                    <label>Hotel</label>
+                    <select id="dash-hotel-filter" onchange="loadDashboard()">
+                        <option value="">All Hotels</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Status</label>
+                    <select id="dash-status-filter" onchange="loadDashboard()">
+                        <option value="">All Status</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="pending">Pending</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="stats-cards">
+                <div class="stat-card">
+                    <h4>Total Bookings</h4>
+                    <p id="dash-total">0</p>
+                </div>
+                <div class="stat-card">
+                    <h4>Confirmed</h4>
+                    <p id="dash-confirmed">0</p>
+                </div>
+                <div class="stat-card">
+                    <h4>Pending</h4>
+                    <p id="dash-pending">0</p>
+                </div>
+                <div class="stat-card">
+                    <h4>Total Revenue</h4>
+                    <p id="dash-revenue">₹0</p>
+                </div>
+            </div>
+
+            <div class="events-table">
+                <h3>Upcoming Bookings</h3>
+                <div style="overflow-x:auto;">
+                    <table id="dashboard-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Guest</th>
+                                <th>Hotel</th>
+                                <th>Pax</th>
+                                <th>Status</th>
+                                <th>Payment</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dashboard-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bookings Tab -->
+        <div id="bookings-tab" class="tab-content">
+            <div class="section-header">
+                <h2>Booking Management</h2>
+                <div class="header-actions">
+                    <div class="view-controls">
+                        <button class="view-btn active" onclick="switchView('table')" title="Table View">📋</button>
+                        <button class="view-btn" onclick="switchView('card')" title="Card View">📇</button>
+                        <button class="view-btn" onclick="switchView('calendar')" title="Calendar View">📅</button>
+                    </div>
+                    <div class="bulk-actions" style="display:none;">
+                        <select id="bulk-action">
+                            <option value="">Bulk Actions</option>
+                            <option value="confirm">Mark as Confirmed</option>
+                            <option value="complete">Mark as Completed</option>
+                            <option value="delete">Delete Selected</option>
+                            <option value="export">Export Selected</option>
+                        </select>
+                        <button onclick="executeBulkAction()" class="secondary-btn">Apply</button>
+                    </div>
+                    <div class="action-group">
+                        <button onclick="exportBookings()" class="secondary-btn">📊 Export</button>
+                        <button onclick="showNewBookingForm()" class="primary-btn">+ New Booking</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="booking-form" style="display:none; background: white; padding: 2rem; border-radius: 10px; margin-bottom: 2rem; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);">
+                <h3 id="booking-form-title">New Booking</h3>
+                <input type="hidden" id="booking-id">
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Guest Name *</label>
+                        <input type="text" id="guest-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone * <span class="field-hint">(10 digits)</span></label>
+                        <input type="tel" id="guest-phone" maxlength="10" pattern="[0-9]{10}" placeholder="9876543210" required>
+                        <div class="error-msg" id="phone-error"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>Location *</label>
+                        <input type="text" id="guest-location" placeholder="City, State" required>
+                        <div class="error-msg" id="location-error"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>Address</label>
+                        <input type="text" id="guest-address" placeholder="Full address">
+                    </div>
+                    <div class="form-group">
+                        <label>Date *</label>
+                        <input type="date" id="date" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Hotel Name</label>
+                        <input type="text" id="hotel-name">
+                    </div>
+                    <div class="form-group">
+                        <label>Pax</label>
+                        <input type="number" id="pax">
+                    </div>
+                    <div class="form-group">
+                        <label>Training Name</label>
+                        <input type="text" id="training-name">
+                    </div>
+                    <div class="form-group">
+                        <label>Occupancy</label>
+                        <input type="text" id="occup">
+                    </div>
+                    <div class="form-group">
+                        <label>H-Rate</label>
+                        <input type="number" id="h-rate" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>G-Rate</label>
+                        <input type="number" id="g-rate" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>1st Day Requirement</label>
+                        <input type="text" id="day1-req">
+                    </div>
+                    <div class="form-group">
+                        <label>2nd Day Requirement</label>
+                        <input type="text" id="day2-req">
+                    </div>
+                    <div class="form-group">
+                        <label>LED Wall</label>
+                        <select id="led-wall">
+                            <option value="">Select</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>LCD</label>
+                        <select id="lcd">
+                            <option value="">Select</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Audio</label>
+                        <select id="audio">
+                            <option value="">Select</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Status *</label>
+                        <select id="booking-status" required>
+                            <option value="">Select Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="confirmed">Confirmed</option>
+                            <option value="completed">Completed</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                        <div class="error-msg" id="status-error"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>Payment Status *</label>
+                        <select id="payment-status">
+                            <option value="unpaid">Unpaid</option>
+                            <option value="partial">Partial</option>
+                            <option value="paid">Paid</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Amount Paid</label>
+                        <input type="number" id="amount-paid" step="0.01">
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button onclick="saveBooking()" class="primary-btn">Save Booking</button>
+                    <button onclick="cancelBookingForm()" class="secondary-btn">Cancel</button>
+                </div>
+            </div>
+
+            <div class="filters">
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label>Search</label>
+                        <input type="text" id="search-booking" placeholder="Guest, phone, hotel, location..." onkeyup="filterBookings()">
+                    </div>
+                    <div class="filter-group">
+                        <label>Date Range</label>
+                        <select id="date-range-filter" onchange="filterBookings()">
+                            <option value="current-upcoming">Current & Upcoming</option>
+                            <option value="all">All Bookings</option>
+                            <option value="completed">Completed Only</option>
+                            <option value="this-month">This Month</option>
+                            <option value="next-month">Next Month</option>
+                            <option value="custom">Custom Range</option>
+                        </select>
+                    </div>
+                    <div class="filter-group custom-date" style="display:none;">
+                        <label>From - To</label>
+                        <div class="date-range">
+                            <input type="date" id="date-from" onchange="filterBookings()">
+                            <input type="date" id="date-to" onchange="filterBookings()">
+                        </div>
+                    </div>
+                </div>
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label>Status</label>
+                        <select id="status-filter" onchange="filterBookings()">
+                            <option value="">All Status</option>
+                            <option value="confirmed">Confirmed</option>
+                            <option value="pending">Pending</option>
+                            <option value="completed">Completed</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Payment</label>
+                        <select id="payment-filter" onchange="filterBookings()">
+                            <option value="">All Payments</option>
+                            <option value="paid">Paid</option>
+                            <option value="partial">Partial</option>
+                            <option value="unpaid">Unpaid</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Location</label>
+                        <select id="location-filter" onchange="filterBookings()">
+                            <option value="">All Locations</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Sort By</label>
+                        <select id="sort-filter" onchange="filterBookings()">
+                            <option value="date-asc">Date (Oldest First)</option>
+                            <option value="date-desc">Date (Newest First)</option>
+                            <option value="name-asc">Guest Name (A-Z)</option>
+                            <option value="amount-desc">Amount (High to Low)</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Show</label>
+                        <select id="per-page" onchange="filterBookings()">
+                            <option value="25">25 per page</option>
+                            <option value="50">50 per page</option>
+                            <option value="100">100 per page</option>
+                            <option value="all">Show All</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="filter-actions">
+                    <button onclick="resetFilters()" class="secondary-btn">🔄 Reset Filters</button>
+                    <button onclick="saveView()" class="secondary-btn">💾 Save View</button>
+                    <div class="results-info">
+                        <span id="results-count">0 bookings found</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table View -->
+            <div id="table-view" class="view-content active">
+                <div class="events-table">
+                    <div class="table-header">
+                        <h3>Bookings List</h3>
+                        <div class="table-controls">
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="select-all" onchange="toggleSelectAll()">
+                                <span class="checkmark"></span>
+                                Select All
+                            </label>
+                            <button onclick="toggleColumns()" class="secondary-btn">⚙️ Columns</button>
+                        </div>
+                    </div>
+                    <div style="overflow-x:auto;">
+                        <table id="bookings-table">
+                            <thead>
+                                <tr>
+                                    <th><input type="checkbox" id="header-checkbox" onchange="toggleSelectAll()"></th>
+                                    <th class="sortable" onclick="sortTable('date')">Date 📅</th>
+                                    <th class="sortable" onclick="sortTable('guestName')">Guest 👤</th>
+                                    <th>Phone 📞</th>
+                                    <th>Location 📍</th>
+                                    <th>Hotel 🏨</th>
+                                    <th>Pax 👥</th>
+                                    <th>Status 📊</th>
+                                    <th>Payment 💳</th>
+                                    <th class="sortable" onclick="sortTable('amountPaid')">Amount 💰</th>
+                                    <th>Actions ⚡</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bookings-tbody"></tbody>
+                        </table>
+                    </div>
+                    <div class="pagination" id="pagination"></div>
+                </div>
+            </div>
+
+            <!-- Card View -->
+            <div id="card-view" class="view-content">
+                <div class="cards-container" id="cards-container"></div>
+                <div class="pagination" id="card-pagination"></div>
+            </div>
+
+            <!-- Calendar View -->
+            <div id="calendar-view" class="view-content">
+                <div class="calendar-header">
+                    <button onclick="previousMonth()" class="secondary-btn">‹ Previous</button>
+                    <h3 id="calendar-month"></h3>
+                    <button onclick="nextMonth()" class="secondary-btn">Next ›</button>
+                </div>
+                <div class="calendar-grid" id="calendar-grid"></div>
+            </div>
+        </div>
+
+        <!-- Hotels Tab -->
+        <div id="hotels-tab" class="tab-content">
+            <div class="section-header">
+                <h2>Hotel Rate Management</h2>
+            </div>
+
+            <div style="background: white; padding: 2rem; border-radius: 10px; margin-bottom: 2rem; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);">
+                <h3>Add New Hotel</h3>
+                <input type="hidden" id="hotel-id">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Hotel Name</label>
+                        <input type="text" id="hotel-name-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Buffet Rate</label>
+                        <input type="number" id="buffet-rate" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>Hi Tea</label>
+                        <input type="number" id="hi-tea" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>CP Single</label>
+                        <input type="number" id="cp-single" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>CP Double</label>
+                        <input type="number" id="cp-double" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>CP Triple</label>
+                        <input type="number" id="cp-triple" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>AP Single</label>
+                        <input type="number" id="ap-single" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>AP Double</label>
+                        <input type="number" id="ap-double" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>AP Triple</label>
+                        <input type="number" id="ap-triple" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>SGL AP + 1 Meal</label>
+                        <input type="number" id="sgl-ap-meal" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>Dble AP + 1 Meal</label>
+                        <input type="number" id="dble-ap-meal" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>Trip AP + 1 Meal</label>
+                        <input type="number" id="trip-ap-meal" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>Total Rooms</label>
+                        <input type="number" id="total-rooms">
+                    </div>
+                    <div class="form-group">
+                        <label>Banquet Hall & Capacity</label>
+                        <input type="text" id="banquet-capacity">
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button onclick="saveHotel()" class="primary-btn">Save Hotel</button>
+                    <button onclick="resetHotelForm()" class="secondary-btn">Reset</button>
+                </div>
+            </div>
+
+            <div class="events-table">
+                <h3>All Hotels</h3>
+                <div style="overflow-x:auto;">
+                    <table id="hotels-table">
+                        <thead>
+                            <tr>
+                                <th>Hotel Name</th>
+                                <th>Buffet Rate</th>
+                                <th>Hi Tea</th>
+                                <th>CP Single</th>
+                                <th>Total Rooms</th>
+                                <th>Banquet</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="hotels-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Users Tab -->
+        <div id="users-tab" class="tab-content">
+            <div class="section-header">
+                <h2>User Management</h2>
+            </div>
+
+            <div style="background: white; padding: 2rem; border-radius: 10px; margin-bottom: 2rem; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);">
+                <h3>Create New User</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" id="new-user-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="new-user-name" required>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button onclick="createUser()" class="primary-btn">Create User</button>
+                </div>
+            </div>
+
+            <div class="events-table">
+                <h3>All Users</h3>
+                <div style="overflow-x:auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Email</th>
+                                <th>Name</th>
+                                <th>Created At</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="dashboard.js"></script>
+</body>
+</html>

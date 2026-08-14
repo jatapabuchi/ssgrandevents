@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Login - SS Grand Events</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            padding: 2rem;
+        }
+
+        .login-box {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .login-box h2 {
+            margin-bottom: 1.5rem;
+            text-align: center;
+            color: #1a1a2e;
+            font-size: 1.8rem;
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 0.8rem;
+            margin: 0.8rem 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .login-box input:focus {
+            outline: none;
+            border-color: #00d4ff;
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
+        }
+
+        .login-box button {
+            width: 100%;
+            padding: 0.8rem;
+            background: linear-gradient(135deg, #00d4ff, #0099ff);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 1rem;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .login-box button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 212, 255, 0.3);
+        }
+
+        #message {
+            padding: 0.8rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+            display: none;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        #message.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        #message.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        #otp-timer {
+            font-size: 0.9rem;
+            color: #666;
+            text-align: center;
+            margin: 0.5rem 0;
+        }
+
+        .login-box a {
+            display: block;
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #00d4ff;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .login-box a:hover {
+            color: #0099ff;
+        }
+
+        .info-text {
+            background: #f0f4ff;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            color: #555;
+            border-left: 4px solid #00d4ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <h2>Employee Login</h2>
+            
+            <div id="phone-section">
+                <input type="email" id="phone" placeholder="Enter your email">
+                <button onclick="sendOTP()">Send OTP</button>
+                <div class="info-text">
+                    📧 We'll send a 6-digit OTP to your email. You can switch tabs to get it!
+                </div>
+            </div>
+
+            <div id="otp-section" style="display:none;">
+                <div class="info-text">
+                    ✅ OTP sent! Check your email and enter it below.
+                </div>
+                <input type="text" id="otp" placeholder="Enter 6-digit OTP" maxlength="6" inputmode="numeric">
+                <p id="otp-timer"></p>
+                <button onclick="verifyOTP()">Verify & Login</button>
+                <button onclick="resendOTP()" style="background: #6c757d; margin-top: 0.5rem;">Resend OTP</button>
+            </div>
+
+            <div id="message"></div>
+            <a href="index.html">← Back to Home</a>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="auth.js"></script>
+</body>
+</html>
