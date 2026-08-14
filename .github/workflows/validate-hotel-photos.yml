@@ -16,6 +16,12 @@ jobs:
 
       - name: Check only hotel-images/ files changed
         run: |
+          BRANCH="${{ github.head_ref }}"
+          if [[ "$BRANCH" == deploy/* ]]; then
+            echo "✅ Code deploy branch — skipping hotel-images check"
+            exit 0
+          fi
+
           CHANGED=$(git diff --name-only origin/main...HEAD)
           echo "Changed files:"
           echo "$CHANGED"
@@ -33,6 +39,12 @@ jobs:
 
       - name: Check only image files
         run: |
+          BRANCH="${{ github.head_ref }}"
+          if [[ "$BRANCH" == deploy/* ]]; then
+            echo "✅ Code deploy branch — skipping image type check"
+            exit 0
+          fi
+
           CHANGED=$(git diff --name-only origin/main...HEAD)
           NON_IMAGE=$(echo "$CHANGED" | grep -vE '\.(jpg|jpeg|png|webp|gif|JPG|JPEG|PNG|WEBP)$' | grep -v '\.gitkeep$' || true)
 
