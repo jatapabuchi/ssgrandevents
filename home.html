@@ -3,95 +3,410 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SS Grand Events - Home</title>
+    <title>SS Grand Events - Premier Event Management</title>
     <link rel="stylesheet" href="styles.css">
     <style>
-        .home-hero {
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; }
+
+        /* ── HERO ── */
+        .hero {
+            position: relative;
             width: 100%;
             height: 100vh;
-            background: url('2026-01-19.webp') center/cover no-repeat fixed;
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
+            overflow: hidden;
         }
 
-        .home-hero::before {
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            background: url('2026-01-19.webp') center/cover no-repeat;
+            transform: scale(1.05);
+            animation: slowZoom 20s ease-in-out infinite alternate;
+        }
+
+        @keyframes slowZoom {
+            from { transform: scale(1.05); }
+            to   { transform: scale(1.12); }
+        }
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                135deg,
+                rgba(10, 10, 30, 0.82) 0%,
+                rgba(0, 50, 80, 0.65) 50%,
+                rgba(10, 10, 30, 0.75) 100%
+            );
+        }
+
+        /* animated shimmer lines */
+        .hero-overlay::after {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.3);
+            inset: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 212, 255, 0.03) 2px,
+                rgba(0, 212, 255, 0.03) 4px
+            );
+            pointer-events: none;
         }
 
-        .home-content {
+        .hero-content {
             position: relative;
             z-index: 2;
             text-align: center;
+            padding: 2rem;
+            max-width: 900px;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(0, 212, 255, 0.15);
+            border: 1px solid rgba(0, 212, 255, 0.4);
+            color: #00d4ff;
+            padding: 0.4rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+            backdrop-filter: blur(10px);
+            animation: fadeDown 0.8s ease both;
+        }
+
+        .hero-title {
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 900;
             color: white;
-        }
-
-        .home-content h1 {
-            font-size: 4rem;
-            font-weight: 800;
+            line-height: 1.1;
             margin-bottom: 1rem;
-            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
+            animation: fadeDown 0.8s ease 0.2s both;
         }
 
-        .home-content p {
-            font-size: 1.5rem;
-            margin-bottom: 2rem;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        .hero-title span {
+            background: linear-gradient(135deg, #00d4ff, #0099ff, #00d4ff);
+            background-size: 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 3s linear infinite;
         }
 
-        .home-buttons {
+        @keyframes shimmer {
+            0%   { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1rem, 2.5vw, 1.4rem);
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 2.5rem;
+            line-height: 1.7;
+            animation: fadeDown 0.8s ease 0.4s both;
+        }
+
+        .hero-buttons {
             display: flex;
             gap: 1rem;
             justify-content: center;
             flex-wrap: wrap;
+            animation: fadeDown 0.8s ease 0.6s both;
         }
 
-        .home-btn {
+        .btn-glow {
             padding: 1rem 2.5rem;
-            font-size: 1.1rem;
+            font-size: 1rem;
+            font-weight: 700;
             border-radius: 50px;
             text-decoration: none;
-            font-weight: 700;
             transition: all 0.3s ease;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            letter-spacing: 0.5px;
         }
 
-        .btn-primary {
-            background: white;
-            color: #667eea;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.2);
+        .btn-glow.primary {
+            background: linear-gradient(135deg, #00d4ff, #0099ff);
             color: white;
-            border: 2px solid white;
+            box-shadow: 0 8px 30px rgba(0, 212, 255, 0.4);
         }
 
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.3);
+        .btn-glow.primary:hover {
             transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0, 212, 255, 0.6);
+        }
+
+        .btn-glow.secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-glow.secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #00d4ff;
+            color: #00d4ff;
+            transform: translateY(-3px);
+        }
+
+        /* scroll indicator */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.4rem;
+            color: rgba(255,255,255,0.5);
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            animation: fadeIn 1s ease 1.2s both;
+        }
+
+        .scroll-dot {
+            width: 24px;
+            height: 40px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            padding-top: 6px;
+        }
+
+        .scroll-dot::before {
+            content: '';
+            width: 4px;
+            height: 8px;
+            background: #00d4ff;
+            border-radius: 2px;
+            animation: scrollBounce 1.5s ease infinite;
+        }
+
+        @keyframes scrollBounce {
+            0%, 100% { transform: translateY(0); opacity: 1; }
+            50%       { transform: translateY(10px); opacity: 0.3; }
+        }
+
+        /* ── STATS BAR ── */
+        .stats-bar {
+            background: linear-gradient(135deg, #0a0a1e 0%, #0d1b2a 100%);
+            padding: 3rem 2rem;
+            border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+        }
+
+        .stats-bar .container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .stat-box {
+            text-align: center;
+            padding: 1.5rem;
+            border: 1px solid rgba(0, 212, 255, 0.15);
+            border-radius: 16px;
+            background: rgba(0, 212, 255, 0.04);
+            transition: all 0.3s ease;
+        }
+
+        .stat-box:hover {
+            border-color: rgba(0, 212, 255, 0.4);
+            background: rgba(0, 212, 255, 0.08);
+            transform: translateY(-4px);
+        }
+
+        .stat-box .num {
+            font-size: 2.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #00d4ff, #0099ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-box .label {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.55);
+            margin-top: 0.3rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        /* ── HIGHLIGHTS ── */
+        .highlights {
+            background: linear-gradient(135deg, #0d1b2a 0%, #0a0a1e 100%);
+            padding: 5rem 2rem;
+        }
+
+        .highlights h2 {
+            text-align: center;
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+
+        .highlights h2 span {
+            background: linear-gradient(135deg, #00d4ff, #0099ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .highlights-sub {
+            text-align: center;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 3rem;
+            font-size: 1rem;
+        }
+
+        .highlights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .highlight-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(0, 212, 255, 0.12);
+            border-radius: 16px;
+            padding: 2rem 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .highlight-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #00d4ff, #0099ff);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+
+        .highlight-card:hover {
+            border-color: rgba(0, 212, 255, 0.35);
+            transform: translateY(-6px);
+            box-shadow: 0 20px 50px rgba(0, 212, 255, 0.1);
+        }
+
+        .highlight-card:hover::before { transform: scaleX(1); }
+
+        .highlight-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .highlight-card h3 {
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .highlight-card p {
+            color: rgba(255,255,255,0.55);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* ── CTA STRIP ── */
+        .cta-strip {
+            background: linear-gradient(135deg, #00d4ff 0%, #0099ff 50%, #0066cc 100%);
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        .cta-strip h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 0.8rem;
+        }
+
+        .cta-strip p {
+            color: rgba(255,255,255,0.85);
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+
+        .cta-strip a {
+            display: inline-block;
+            background: white;
+            color: #0099ff;
+            padding: 1rem 3rem;
+            border-radius: 50px;
+            font-weight: 800;
+            font-size: 1rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .cta-strip a:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        }
+
+        /* ── FOOTER ── */
+        .home-footer {
+            background: #05050f;
+            color: rgba(255,255,255,0.4);
+            text-align: center;
+            padding: 1.5rem;
+            font-size: 0.85rem;
+            border-top: 1px solid rgba(0, 212, 255, 0.1);
+        }
+
+        /* animations */
+        @keyframes fadeDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+
+        /* nav override for dark bg */
+        nav { position: absolute; width: 100%; background: transparent; box-shadow: none; z-index: 10; }
+
+        @media (max-width: 768px) {
+            nav { position: relative; background: linear-gradient(135deg, #1a1a2e, #16213e); }
+            nav ul { flex-wrap: wrap; gap: 0.5rem; justify-content: center; }
+            .hero-title { font-size: 2.5rem; }
         }
     </style>
 </head>
 <body>
+
     <nav>
         <div class="container">
             <h1>SS Grand Events</h1>
             <ul>
                 <li><a href="home.html">Home</a></li>
                 <li><a href="index.html#services">Services</a></li>
+                <li><a href="index.html#hotels">Hotels</a></li>
                 <li><a href="index.html#about">About</a></li>
                 <li><a href="index.html#contact">Contact</a></li>
                 <li><a href="login.html" class="login-btn">Employee Login</a></li>
@@ -99,16 +414,104 @@
         </div>
     </nav>
 
-    <section class="home-hero">
-        <div class="home-content">
-            <h1>SS Grand Events</h1>
-            <p>Creating Unforgettable Moments</p>
-            <div class="home-buttons">
-                <a href="index.html#services" class="home-btn btn-primary">Explore Services</a>
-                <a href="index.html#contact" class="home-btn btn-secondary">Get In Touch</a>
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <div class="hero-badge">✦ Salem's Premier Event Company</div>
+            <h1 class="hero-title">
+                <span>SS Grand</span><br>Events
+            </h1>
+            <p class="hero-subtitle">
+                Creating unforgettable corporate events, dream vacations &amp;<br>
+                grand celebrations across India — with passion and precision.
+            </p>
+            <div class="hero-buttons">
+                <a href="index.html#services" class="btn-glow primary">✦ Explore Services</a>
+                <a href="index.html#contact" class="btn-glow secondary">Get In Touch</a>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <div class="scroll-dot"></div>
+            <span>SCROLL</span>
+        </div>
+    </section>
+
+    <!-- STATS -->
+    <div class="stats-bar">
+        <div class="container">
+            <div class="stat-box">
+                <div class="num">10+</div>
+                <div class="label">Years Experience</div>
+            </div>
+            <div class="stat-box">
+                <div class="num">500+</div>
+                <div class="label">Events Managed</div>
+            </div>
+            <div class="stat-box">
+                <div class="num">50+</div>
+                <div class="label">Partner Hotels</div>
+            </div>
+            <div class="stat-box">
+                <div class="num">7</div>
+                <div class="label">States Covered</div>
+            </div>
+            <div class="stat-box">
+                <div class="num">100%</div>
+                <div class="label">Client Satisfaction</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HIGHLIGHTS -->
+    <section class="highlights">
+        <h2>Why Choose <span>SS Grand Events?</span></h2>
+        <p class="highlights-sub">Everything you need for a perfect event, under one roof</p>
+        <div class="highlights-grid">
+            <div class="highlight-card">
+                <div class="highlight-icon">🏢</div>
+                <h3>Corporate Events</h3>
+                <p>Conferences, seminars, product launches and team outings handled end-to-end.</p>
+            </div>
+            <div class="highlight-card">
+                <div class="highlight-icon">✈️</div>
+                <h3>Vacation Planning</h3>
+                <p>Customized travel packages across India with complete coordination.</p>
+            </div>
+            <div class="highlight-card">
+                <div class="highlight-icon">🏨</div>
+                <h3>Hotel Partnerships</h3>
+                <p>50+ premium partner hotels across 7 states for the best rates and service.</p>
+            </div>
+            <div class="highlight-card">
+                <div class="highlight-icon">💒</div>
+                <h3>Residential Events</h3>
+                <p>Weddings, anniversaries and family celebrations with complete management.</p>
+            </div>
+            <div class="highlight-card">
+                <div class="highlight-icon">💰</div>
+                <h3>Transparent Budgeting</h3>
+                <p>No hidden costs. Full budget visibility and cost optimization at every step.</p>
+            </div>
+            <div class="highlight-card">
+                <div class="highlight-icon">🤝</div>
+                <h3>Vendor Network</h3>
+                <p>Trusted caterers, decorators and AV teams for seamless event execution.</p>
             </div>
         </div>
     </section>
+
+    <!-- CTA -->
+    <div class="cta-strip">
+        <h2>Ready to Plan Your Next Event?</h2>
+        <p>Let's create something extraordinary together</p>
+        <a href="index.html#contact">Contact Us Today</a>
+    </div>
+
+    <footer class="home-footer">
+        <p>&copy; 2024 SS Grand Events. All rights reserved. | Salem, Tamil Nadu</p>
+    </footer>
 
     <script src="config.js"></script>
 </body>
