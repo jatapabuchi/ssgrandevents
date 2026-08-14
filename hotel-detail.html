@@ -361,20 +361,21 @@
     // Shared place-level images shown for all hotels in that place
     // Structure: place key -> array of image paths
     const PLACE_IMAGES = {
-        'yercaud':      ['hotel-images/tamil-nadu/yercaud/1.jpg','hotel-images/tamil-nadu/yercaud/2.jpg'],
-        'kodaikanal':   ['hotel-images/tamil-nadu/kodaikanal/1.jpg'],
-        'coimbatore':   ['hotel-images/tamil-nadu/coimbatore/1.jpg'],
-        'anakatti':     ['hotel-images/tamil-nadu/anakatti/1.jpg'],
-        'bangalore':    ['hotel-images/karnataka/bangalore/1.jpg','hotel-images/karnataka/bangalore/2.jpg'],
-        'mysore':       ['hotel-images/karnataka/mysore/1.jpg','hotel-images/karnataka/mysore/2.jpg'],
-        'coorg':        ['hotel-images/karnataka/coorg/1.jpg'],
-        'kochi':        ['hotel-images/kerala/kochi/1.jpg','hotel-images/kerala/kochi/2.jpg'],
-        'thrissur':     ['hotel-images/kerala/thrissur/1.jpg'],
-        'thekkady':     ['hotel-images/kerala/thekkady/1.jpg'],
-        'munnar':       ['hotel-images/kerala/munnar/1.jpg','hotel-images/kerala/munnar/2.jpg'],
-        'palakkad':     ['hotel-images/kerala/palakkad/1.jpg'],
-        'pondicherry':  ['hotel-images/pondicherry/pondicherry/1.jpg','hotel-images/pondicherry/pondicherry/2.jpg']
+        'yercaud':      ['hotel-images/tamil-nadu/yercaud/_cover/1.jpg','hotel-images/tamil-nadu/yercaud/_cover/2.jpg'],
+        'kodaikanal':   ['hotel-images/tamil-nadu/kodaikanal/_cover/1.jpg'],
+        'coimbatore':   ['hotel-images/tamil-nadu/coimbatore/_cover/1.jpg'],
+        'anakatti':     ['hotel-images/tamil-nadu/anakatti/_cover/1.jpg'],
+        'bangalore':    ['hotel-images/karnataka/bangalore/_cover/1.jpg','hotel-images/karnataka/bangalore/_cover/2.jpg'],
+        'mysore':       ['hotel-images/karnataka/mysore/_cover/1.jpg','hotel-images/karnataka/mysore/_cover/2.jpg'],
+        'coorg':        ['hotel-images/karnataka/coorg/_cover/1.jpg'],
+        'kochi':        ['hotel-images/kerala/kochi/_cover/1.jpg','hotel-images/kerala/kochi/_cover/2.jpg'],
+        'thrissur':     ['hotel-images/kerala/thrissur/_cover/1.jpg'],
+        'thekkady':     ['hotel-images/kerala/thekkady/_cover/1.jpg'],
+        'munnar':       ['hotel-images/kerala/munnar/_cover/1.jpg','hotel-images/kerala/munnar/_cover/2.jpg'],
+        'palakkad':     ['hotel-images/kerala/palakkad/_cover/1.jpg'],
+        'pondicherry':  ['hotel-images/pondicherry/pondicherry/_cover/1.jpg','hotel-images/pondicherry/pondicherry/_cover/2.jpg']
     };
+    // Per-hotel images: add entry as 'hotel-slug': ['hotel-images/state/place/hotel-slug/1.jpg', ...]
     const HOTEL_IMAGES = {};
 
     function slugify(str) {
