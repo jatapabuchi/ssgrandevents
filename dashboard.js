@@ -10,6 +10,10 @@ let selectedBookings = [];
 let currentSort = { field: 'date', direction: 'asc' };
 let currentCalendarDate = new Date();
 
+function esc(str) {
+    return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
 function checkAuth() {
     const token = localStorage.getItem('token');
     const tokenExpiry = localStorage.getItem('tokenExpiry');
@@ -120,12 +124,12 @@ async function loadDashboard() {
         tbody.innerHTML = filtered.map(b => `
             <tr>
                 <td>${new Date(b.date).toLocaleDateString()}</td>
-                <td>${b.guestName}</td>
-                <td>${b.hotelName || '-'}</td>
-                <td>${b.pax || '-'}</td>
-                <td><span class="status-badge status-${b.status}">${b.status}</span></td>
-                <td><span class="status-badge payment-${b.paymentStatus}">${b.paymentStatus}</span></td>
-                <td>₹${b.amountPaid || 0}</td>
+                <td>${esc(b.guestName)}</td>
+                <td>${esc(b.hotelName) || '-'}</td>
+                <td>${esc(b.pax) || '-'}</td>
+                <td><span class="status-badge status-${esc(b.status)}">${esc(b.status)}</span></td>
+                <td><span class="status-badge payment-${esc(b.paymentStatus)}">${esc(b.paymentStatus)}</span></td>
+                <td>₹${esc(b.amountPaid) || 0}</td>
             </tr>
         `).join('');
         
@@ -167,21 +171,21 @@ function displayBookingsCards(bookings) {
     container.innerHTML = pageBookings.map(b => `
         <div class="booking-card">
             <div class="card-header">
-                <div class="card-title">${b.guestName}</div>
+                <div class="card-title">${esc(b.guestName)}</div>
                 <div class="card-date">${new Date(b.date).toLocaleDateString()}</div>
             </div>
             <div class="card-details">
-                <div class="card-detail"><span>📞 Phone:</span><span>${b.guestPhone || '-'}</span></div>
-                <div class="card-detail"><span>📍 Location:</span><span>${b.guestLocation || '-'}</span></div>
-                <div class="card-detail"><span>🏨 Hotel:</span><span>${b.hotelName || '-'}</span></div>
-                <div class="card-detail"><span>👥 Pax:</span><span>${b.pax || '-'}</span></div>
-                <div class="card-detail"><span>📊 Status:</span><span class="status-badge status-${b.status}">${b.status || 'pending'}</span></div>
-                <div class="card-detail"><span>💳 Payment:</span><span class="status-badge payment-${b.paymentStatus}">${b.paymentStatus || 'unpaid'}</span></div>
-                <div class="card-detail"><span>💰 Amount:</span><span>₹${b.amountPaid || 0}</span></div>
+                <div class="card-detail"><span>📞 Phone:</span><span>${esc(b.guestPhone) || '-'}</span></div>
+                <div class="card-detail"><span>📍 Location:</span><span>${esc(b.guestLocation) || '-'}</span></div>
+                <div class="card-detail"><span>🏨 Hotel:</span><span>${esc(b.hotelName) || '-'}</span></div>
+                <div class="card-detail"><span>👥 Pax:</span><span>${esc(b.pax) || '-'}</span></div>
+                <div class="card-detail"><span>📊 Status:</span><span class="status-badge status-${esc(b.status)}">${esc(b.status) || 'pending'}</span></div>
+                <div class="card-detail"><span>💳 Payment:</span><span class="status-badge payment-${esc(b.paymentStatus)}">${esc(b.paymentStatus) || 'unpaid'}</span></div>
+                <div class="card-detail"><span>💰 Amount:</span><span>₹${esc(b.amountPaid) || 0}</span></div>
             </div>
             <div class="card-actions">
                 <button class="action-btn edit-btn" onclick='editBooking(${JSON.stringify(b)})'>Edit</button>
-                <button class="action-btn delete-btn" onclick="deleteBooking('${b.id}')">Delete</button>
+                <button class="action-btn delete-btn" onclick="deleteBooking('${esc(b.id)}')">Delete</button>
             </div>
         </div>
     `).join('');
@@ -225,7 +229,7 @@ function displayCalendar() {
                 <div style="font-weight:600;margin-bottom:0.5rem;">${day}</div>
                 ${dayBookings.map(b => `
                     <div class="calendar-event" onclick='editBooking(${JSON.stringify(b)})'>
-                        ${b.guestName} - ${b.hotelName || 'No Hotel'}
+                        ${esc(b.guestName)} - ${esc(b.hotelName) || 'No Hotel'}
                     </div>
                 `).join('')}
             </div>
@@ -486,19 +490,19 @@ function displayBookings(bookings) {
     
     tbody.innerHTML = pageBookings.map(b => `
         <tr>
-            <td><input type="checkbox" data-booking-id="${b.id}" onchange="toggleBookingSelection('${b.id}')"></td>
+            <td><input type="checkbox" data-booking-id="${esc(b.id)}" onchange="toggleBookingSelection('${esc(b.id)}')"></td>
             <td>${new Date(b.date).toLocaleDateString()}</td>
-            <td>${b.guestName}</td>
-            <td>${b.guestPhone || '-'}</td>
-            <td>${b.guestLocation || '-'}</td>
-            <td>${b.hotelName || '-'}</td>
-            <td>${b.pax || '-'}</td>
-            <td><span class="status-badge status-${b.status}">${b.status || 'pending'}</span></td>
-            <td><span class="status-badge payment-${b.paymentStatus}">${b.paymentStatus || 'unpaid'}</span></td>
+            <td>${esc(b.guestName)}</td>
+            <td>${esc(b.guestPhone) || '-'}</td>
+            <td>${esc(b.guestLocation) || '-'}</td>
+            <td>${esc(b.hotelName) || '-'}</td>
+            <td>${esc(b.pax) || '-'}</td>
+            <td><span class="status-badge status-${esc(b.status)}">${esc(b.status) || 'pending'}</span></td>
+            <td><span class="status-badge payment-${esc(b.paymentStatus)}">${esc(b.paymentStatus) || 'unpaid'}</span></td>
             <td>₹${(b.amountPaid || 0).toLocaleString()}</td>
             <td>
                 <button class="action-btn edit-btn" onclick='editBooking(${JSON.stringify(b)})'>Edit</button>
-                <button class="action-btn delete-btn" onclick="deleteBooking('${b.id}')">Delete</button>
+                <button class="action-btn delete-btn" onclick="deleteBooking('${esc(b.id)}')">Delete</button>
             </td>
         </tr>
     `).join('');
@@ -785,15 +789,15 @@ async function loadHotels() {
         
         tbody.innerHTML = hotels.map(h => `
             <tr>
-                <td>${h.hotelName}</td>
-                <td>${h.buffetRate}</td>
-                <td>${h.hiTea}</td>
-                <td>${h.cpSingle}</td>
-                <td>${h.totalRooms}</td>
-                <td>${h.banquetCapacity}</td>
+                <td>${esc(h.hotelName)}</td>
+                <td>${esc(h.buffetRate)}</td>
+                <td>${esc(h.hiTea)}</td>
+                <td>${esc(h.cpSingle)}</td>
+                <td>${esc(h.totalRooms)}</td>
+                <td>${esc(h.banquetCapacity)}</td>
                 <td>
                     <button class="action-btn edit-btn" onclick='editHotel(${JSON.stringify(h)})'>Edit</button>
-                    <button class="action-btn delete-btn" onclick="deleteHotel('${h.id}')">Delete</button>
+                    <button class="action-btn delete-btn" onclick="deleteHotel('${esc(h.id)}')">Delete</button>
                 </td>
             </tr>
         `).join('');
@@ -919,11 +923,11 @@ async function loadUsers() {
         
         tbody.innerHTML = users.map(u => `
             <tr>
-                <td>${u.email}</td>
-                <td>${u.name}</td>
+                <td>${esc(u.email)}</td>
+                <td>${esc(u.name)}</td>
                 <td>${u.createdAt ? new Date(u.createdAt).toLocaleDateString() : '-'}</td>
                 <td>
-                    ${u.email !== 'ssgrandevents@gmail.com' ? `<button class="action-btn delete-btn" onclick="deleteUser('${u.email}')">Delete</button>` : '<span style="color:#999">Protected</span>'}
+                    ${u.email !== 'ssgrandevents@gmail.com' ? `<button class="action-btn delete-btn" onclick="deleteUser('${esc(u.email)}')">Delete</button>` : '<span style="color:#999">Protected</span>'}
                 </td>
             </tr>
         `).join('');
@@ -942,7 +946,7 @@ async function createUser() {
     }
     
     const token = localStorage.getItem('token');
-    const currentUserEmail = atob(token).split(':')[0];
+    const currentUserEmail = localStorage.getItem('userEmail');
     
     try {
         await fetch(`${CONFIG.API_URL}/auth/send-otp`, {

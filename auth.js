@@ -1,6 +1,9 @@
 const MAX_OTP_ATTEMPTS = 3;
-let otpAttempts = 0;
 let otpTimerInterval = null;
+
+function getOtpAttempts() { return parseInt(sessionStorage.getItem('otpAttempts') || '0'); }
+function setOtpAttempts(n) { sessionStorage.setItem('otpAttempts', n); }
+function resetOtpAttempts() { sessionStorage.removeItem('otpAttempts'); }
 
 // Check if user was in OTP section when page loads
 window.addEventListener('load', () => {
@@ -46,8 +49,7 @@ async function sendOTP() {
             // Save to localStorage so page stays open when switching tabs
             localStorage.setItem('loginEmail', email);
             localStorage.setItem('otpTime', Date.now());
-            
-            otpAttempts = 0;
+            resetOtpAttempts();
             startOTPTimer(300);
         } else {
             showMessage(data.message || 'Failed to send OTP', 'error');
@@ -89,7 +91,7 @@ async function resendOTP() {
         if (response.ok) {
             showMessage('New OTP sent to your email', 'success');
             localStorage.setItem('otpTime', Date.now());
-            otpAttempts = 0;
+            resetOtpAttempts();
             document.getElementById('otp').value = '';
             if (otpTimerInterval) clearInterval(otpTimerInterval);
             startOTPTimer(300);
@@ -110,8 +112,9 @@ async function verifyOTP() {
         return;
     }
     
-    otpAttempts++;
-    
+    const otpAttempts = getOtpAttempts() + 1;
+    setOtpAttempts(otpAttempts);
+
     if (otpAttempts > MAX_OTP_ATTEMPTS) {
         showMessage('Too many attempts. Please request new OTP', 'error');
         if (otpTimerInterval) clearInterval(otpTimerInterval);
@@ -141,13 +144,15 @@ async function verifyOTP() {
             
             localStorage.removeItem('loginEmail');
             localStorage.removeItem('otpTime');
-            
+            resetOtpAttempts();
+            localStorage.setItem('userEmail', data.user.email);
+
             showMessage('Login successful!', 'success');
             setTimeout(() => {
                 window.location.href = 'dashboard.html';
             }, 1000);
         } else {
-            showMessage(`Invalid OTP (${MAX_OTP_ATTEMPTS - otpAttempts} attempts left)`, 'error');
+            showMessage(`Invalid OTP (${MAX_OTP_ATTEMPTS - otpAttempts} attempt${MAX_OTP_ATTEMPTS - otpAttempts === 1 ? '' : 's'} left)`, 'error');
         }
     } catch (error) {
         showMessage('Error verifying OTP', 'error');
