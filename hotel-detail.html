@@ -64,15 +64,30 @@
         .hotel-card {
             background: rgba(255,255,255,0.04);
             border: 1px solid rgba(0,212,255,0.15);
-            border-radius: 18px;
+            border-radius: 16px;
             overflow: hidden;
             transition: all 0.3s ease;
+            position: relative;
         }
+
+        .hotel-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #00d4ff, #0099ff);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+            z-index: 1;
+        }
+
+        .hotel-card:hover::before { transform: scaleX(1); }
 
         .hotel-card:hover {
             transform: translateY(-6px);
-            border-color: rgba(0,212,255,0.4);
-            box-shadow: 0 20px 50px rgba(0,212,255,0.12);
+            border-color: rgba(0,212,255,0.5);
+            box-shadow: 0 20px 50px rgba(0,212,255,0.15);
         }
 
         /* ── SLIDER ── */
